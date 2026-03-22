@@ -1,16 +1,14 @@
 """Views related to texts: title pages, sections, verses, etc."""
 
 import json
-import os
-
 from flask import (
     Blueprint,
     abort,
     current_app,
+    redirect,
     render_template,
     session,
     url_for,
-    send_file,
 )
 from vidyut.lipi import transliterate, Scheme
 
@@ -23,7 +21,6 @@ from ambuda.utils import xml
 from ambuda.utils.json_serde import AmbudaJSONEncoder
 from ambuda.utils.text_validation import ReportSummary
 from ambuda.views.reader.schema import Block, Section
-from ambuda.utils.s3 import S3Path
 from sqlalchemy import exists, orm, select
 
 bp = Blueprint("texts", __name__)
@@ -217,34 +214,13 @@ def download_file(filename):
     text_export = q.text_export(filename)
     if not text_export:
         abort(404)
-    assert text_export
 
-    export_config = text_export.export_config
-    if export_config is None:
+    base_url = current_app.config.get("CLOUDFRONT_BASE_URL")
+    url = text_export.asset_url(base_url) if base_url else None
+    if not url:
         abort(404)
-    assert export_config
 
-    # Check cache first
-    cache = current_app.cache
-    cache_key = f"text_export:{filename}"
-    cached_path = cache.get(cache_key)
-
-    if cached_path and os.path.exists(cached_path):
-        file_path = cached_path
-    else:
-        s3_path = S3Path.from_path(text_export.s3_path)
-        cache_dir = current_app.config.get("CACHE_DIR", "/tmp/ambuda-cache")
-        os.makedirs(cache_dir, exist_ok=True)
-
-        file_path = os.path.join(cache_dir, filename)
-        s3_path.download_file(file_path)
-        cache.set(cache_key, file_path, timeout=0)
-
-    return send_file(
-        file_path,
-        download_name=filename,
-        mimetype=export_config.mime_type,
-    )
+    return redirect(url)
 
 
 @bp.route("/<text_slug>/<section_slug>")

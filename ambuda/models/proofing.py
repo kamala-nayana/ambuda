@@ -343,8 +343,12 @@ class Page(Base):
     def s3_path(self, bucket: str) -> S3Path:
         return S3Path(bucket=bucket, key=f"assets/pages/{self.uuid}.jpg")
 
-    def cloudfront_url(self, base_url: str) -> str:
-        return f"{base_url}/pages/{self.uuid}.jpg"
+    def asset_url(self, bucket: str, base_url: str) -> str:
+        url = self.s3_path(bucket).to_asset_url(base_url)
+        assert url, (
+            f"Page S3 key does not start with assets/: {self.s3_path(bucket).key}"
+        )
+        return url
 
 
 class PageStatus(Base):

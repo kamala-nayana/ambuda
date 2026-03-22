@@ -113,6 +113,13 @@ class S3Path:
     def path(self):
         return f"s3://{self.bucket}/{self.key}"
 
+    def to_asset_url(self, base_url: str) -> str | None:
+        """Return a CloudFront URL if the key is under assets/, otherwise None."""
+        prefix = "assets/"
+        if not self.key.startswith(prefix):
+            return None
+        return f"{base_url}/{self.key.removeprefix(prefix)}"
+
     def exists(self) -> bool:
         try:
             _ = _get_client().head_object(Bucket=self.bucket, Key=self.key)

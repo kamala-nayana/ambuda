@@ -339,9 +339,37 @@ def create_text_archive_inner(app_environment, engine=None):
                         zf.write(xml_file, xml_file.name)
                 zf.write(metadata_path, "metadata.json")
 
+            file_size = zip_path.stat().st_size
+            sha256_hash = hashlib.sha256()
+            with open(zip_path, "rb") as f:
+                for chunk in iter(lambda: f.read(4096), b""):
+                    sha256_hash.update(chunk)
+            checksum = sha256_hash.hexdigest()
+
             s3_path = bulk_config.s3_path(config_obj.S3_BUCKET)
             s3_path.upload_file(zip_path)
             logging.info(f"Uploaded text archive to {s3_path}")
+
+            bulk_export = (
+                session.query(db.BulkExport)
+                .filter(db.BulkExport.slug == zip_filename)
+                .first()
+            )
+            if bulk_export:
+                bulk_export.s3_path = s3_path.path
+                bulk_export.size = file_size
+                bulk_export.sha256_checksum = checksum
+                bulk_export.updated_at = datetime.now(UTC)
+            else:
+                bulk_export = db.BulkExport(
+                    slug=zip_filename,
+                    export_type=bulk_config.type,
+                    s3_path=s3_path.path,
+                    size=file_size,
+                    sha256_checksum=checksum,
+                )
+                session.add(bulk_export)
+            session.commit()
 
 
 @app.task(bind=True)

@@ -139,7 +139,10 @@ def _get_image_url(project: db.Project, page: db.Page) -> str:
             "site.page_image", project_slug=project.slug, page_slug=page.slug
         )
     else:
-        return page.cloudfront_url(current_app.config.get("CLOUDFRONT_BASE_URL", ""))
+        return page.asset_url(
+            current_app.config["S3_BUCKET"],
+            current_app.config.get("CLOUDFRONT_BASE_URL", ""),
+        )
 
 
 def _get_page_data_dict(ctx: PageContext, project: db.Project) -> dict:

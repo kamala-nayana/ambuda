@@ -50,7 +50,7 @@ def prepare_image(
     elif cloudfront_base_url:
         return vision.Image(
             source=vision.ImageSource(
-                image_uri=page.cloudfront_url(cloudfront_base_url)
+                image_uri=page.asset_url(s3_bucket, cloudfront_base_url)
             )
         )
     else:

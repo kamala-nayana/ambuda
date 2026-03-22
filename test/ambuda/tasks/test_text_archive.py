@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+import ambuda.database as db
 from ambuda.tasks.text_exports import create_text_archive_inner
 
 
@@ -63,21 +64,30 @@ class Mocks:
         self.task_s3 = task_s3
         self.utils_s3 = utils_s3
 
-    def setup_session(self, texts, exports_by_text_id=None):
+    def setup_session(self, texts, exports_by_text_id=None, bulk_export=None):
         """Wire the DB session mock to return the given texts and exports."""
         session = MagicMock()
+        self.session = session
+        self.added = []
+        session.add.side_effect = self.added.append
         exports = exports_by_text_id or {}
+        self._bulk_export = bulk_export
 
         def fake_query(model):
             q = MagicMock()
-            q.all.return_value = texts
+
+            if model is db.Text:
+                q.all.return_value = texts
 
             def fake_filter(*args, **kwargs):
                 fq = MagicMock()
-                for text_id, export in exports.items():
-                    fq.first.return_value = export
-                    return fq
-                fq.first.return_value = None
+                if model is db.TextExport:
+                    for text_id, export in exports.items():
+                        fq.first.return_value = export
+                        return fq
+                    fq.first.return_value = None
+                elif model is db.BulkExport:
+                    fq.first.return_value = self._bulk_export
                 return fq
 
             q.filter.return_value = q
@@ -119,7 +129,7 @@ class Mocks:
 
 
 @pytest.fixture
-def mocks():
+def export_mocks():
     with (
         patch("ambuda.tasks.text_exports.get_db_session") as mock_get_db,
         patch("ambuda.tasks.text_exports.create_xml_file") as mock_create_xml,
@@ -129,7 +139,7 @@ def mocks():
         yield Mocks(mock_get_db, mock_create_xml, mock_task_s3, mock_utils_s3)
 
 
-def test_metadata_fields(mocks):
+def test_metadata_fields(export_mocks):
     """metadata.json contains correct fields for each text."""
     text = _make_text(
         id=1,
@@ -142,8 +152,8 @@ def test_metadata_fields(mocks):
         genre_name="kavya",
         collection_slugs=["itihasa", "classics"],
     )
-    mocks.setup_session([text])
-    uploaded = mocks.capture_upload()
+    export_mocks.setup_session([text])
+    uploaded = export_mocks.capture_upload()
 
     create_text_archive_inner("testing")
 
@@ -159,98 +169,98 @@ def test_metadata_fields(mocks):
     assert m["collections"] == ["itihasa", "classics"]
 
 
-def test_downloads_from_s3_when_export_exists(mocks):
+def test_downloads_from_s3_when_export_exists(export_mocks):
     """When a TextExport with s3_path exists, downloads XML from S3."""
     text = _make_text(id=1, slug="gita")
     export = _make_text_export("s3://bucket/assets/text-exports/gita.xml")
-    mocks.setup_session([text], {1: export})
+    export_mocks.setup_session([text], {1: export})
 
     mock_s3_from_path = MagicMock()
-    mocks.task_s3.from_path.return_value = mock_s3_from_path
+    export_mocks.task_s3.from_path.return_value = mock_s3_from_path
 
     def fake_download(path):
         path.write_text("<TEI/>")
 
     mock_s3_from_path.download_file.side_effect = fake_download
-    mocks.task_s3.return_value = MagicMock()
+    export_mocks.task_s3.return_value = MagicMock()
 
     create_text_archive_inner("testing")
 
-    mocks.task_s3.from_path.assert_called_once_with(
+    export_mocks.task_s3.from_path.assert_called_once_with(
         "s3://bucket/assets/text-exports/gita.xml"
     )
     mock_s3_from_path.download_file.assert_called_once()
-    mocks.create_xml_file.assert_not_called()
+    export_mocks.create_xml_file.assert_not_called()
 
 
-def test_falls_back_to_generate_when_no_export(mocks):
+def test_falls_back_to_generate_when_no_export(export_mocks):
     """When no TextExport exists, falls back to create_xml_file."""
     text = _make_text(id=1, slug="gita")
-    mocks.setup_session([text], {})
-    mocks.fake_create_xml()
-    mocks.task_s3.return_value = MagicMock()
+    export_mocks.setup_session([text], {})
+    export_mocks.fake_create_xml()
+    export_mocks.task_s3.return_value = MagicMock()
 
     create_text_archive_inner("testing")
 
-    mocks.create_xml_file.assert_called_once()
-    assert mocks.create_xml_file.call_args[0][0] is text
+    export_mocks.create_xml_file.assert_called_once()
+    assert export_mocks.create_xml_file.call_args[0][0] is text
 
 
-def test_falls_back_on_s3_download_failure(mocks):
+def test_falls_back_on_s3_download_failure(export_mocks):
     """When S3 download fails, falls back to create_xml_file."""
     text = _make_text(id=1, slug="gita")
     export = _make_text_export("s3://bucket/assets/text-exports/gita.xml")
-    mocks.setup_session([text], {1: export})
+    export_mocks.setup_session([text], {1: export})
 
     mock_s3_from_path = MagicMock()
     mock_s3_from_path.download_file.side_effect = Exception("S3 is down")
-    mocks.task_s3.from_path.return_value = mock_s3_from_path
+    export_mocks.task_s3.from_path.return_value = mock_s3_from_path
 
-    mocks.fake_create_xml()
-    mocks.task_s3.return_value = MagicMock()
+    export_mocks.fake_create_xml()
+    export_mocks.task_s3.return_value = MagicMock()
 
     create_text_archive_inner("testing")
 
-    mocks.create_xml_file.assert_called_once()
+    export_mocks.create_xml_file.assert_called_once()
 
 
-def test_no_texts_skips_upload(mocks):
+def test_no_texts_skips_upload(export_mocks):
     """When there are no texts in the DB, no ZIP is created or uploaded."""
-    mocks.setup_session([])
+    export_mocks.setup_session([])
 
     create_text_archive_inner("testing")
 
-    mocks.create_xml_file.assert_not_called()
-    mocks.task_s3.assert_not_called()
+    export_mocks.create_xml_file.assert_not_called()
+    export_mocks.task_s3.assert_not_called()
 
 
-def test_upload_destination(mocks):
+def test_upload_destination(export_mocks):
     """ZIP is uploaded to the correct S3 bucket and key."""
     text = _make_text(id=1, slug="gita")
-    cfg = mocks.setup_session([text])
+    cfg = export_mocks.setup_session([text])
     cfg.S3_BUCKET = "my-bucket"
-    mocks.fake_create_xml()
+    export_mocks.fake_create_xml()
 
     mock_s3_instance = MagicMock()
-    mocks.utils_s3.return_value = mock_s3_instance
+    export_mocks.utils_s3.return_value = mock_s3_instance
 
     create_text_archive_inner("testing")
 
-    call_args = mocks.utils_s3.call_args
+    call_args = export_mocks.utils_s3.call_args
     assert call_args[0][0] == "my-bucket"
     assert call_args[0][1] == "assets/text-exports/ambuda-xml.zip"
     mock_s3_instance.upload_file.assert_called_once()
 
 
-def test_zip_contains_xml_and_metadata(mocks):
+def test_zip_contains_xml_and_metadata(export_mocks):
     """The uploaded ZIP contains XML files and metadata.json."""
     texts = [
         _make_text(id=1, slug="gita", title="Gita"),
         _make_text(id=2, slug="ramayana", title="Ramayana"),
     ]
-    mocks.setup_session(texts)
-    mocks.fake_create_xml()
-    uploaded = mocks.capture_upload()
+    export_mocks.setup_session(texts)
+    export_mocks.fake_create_xml()
+    uploaded = export_mocks.capture_upload()
 
     create_text_archive_inner("testing")
 
@@ -261,13 +271,52 @@ def test_zip_contains_xml_and_metadata(mocks):
     assert "ramayana" in slugs
 
 
-def test_null_config_in_metadata(mocks):
+def test_null_config_in_metadata(export_mocks):
     """Text with config=None produces null in metadata, not a parse error."""
     text = _make_text(id=1, slug="gita", config=None)
-    mocks.setup_session([text])
-    mocks.fake_create_xml()
-    uploaded = mocks.capture_upload()
+    export_mocks.setup_session([text])
+    export_mocks.fake_create_xml()
+    uploaded = export_mocks.capture_upload()
 
     create_text_archive_inner("testing")
 
     assert uploaded["metadata"][0]["config"] is None
+
+
+def test_creates_bulk_export_record(export_mocks):
+    """Running the archive creates a new BulkExport record."""
+    text = _make_text(id=1, slug="gita")
+    export_mocks.setup_session([text])
+    export_mocks.fake_create_xml()
+    export_mocks.capture_upload()
+
+    create_text_archive_inner("testing")
+
+    assert len(export_mocks.added) == 1
+    record = export_mocks.added[0]
+    assert isinstance(record, db.BulkExport)
+    assert record.slug == "ambuda-xml.zip"
+    assert record.export_type == "xml"
+    assert record.s3_path is not None
+    assert record.size > 0
+    assert len(record.sha256_checksum) == 64
+    export_mocks.session.commit.assert_called_once()
+
+
+def test_updates_existing_bulk_export_record(export_mocks):
+    """Re-running the archive updates the existing BulkExport instead of creating a new one."""
+    text = _make_text(id=1, slug="gita")
+    existing = MagicMock()
+    existing.slug = "ambuda-xml.zip"
+    export_mocks.setup_session([text], bulk_export=existing)
+    export_mocks.fake_create_xml()
+    export_mocks.capture_upload()
+
+    create_text_archive_inner("testing")
+
+    assert len(export_mocks.added) == 0
+    assert existing.s3_path is not None
+    assert existing.size > 0
+    assert len(existing.sha256_checksum) == 64
+    assert existing.updated_at is not None
+    export_mocks.session.commit.assert_called_once()

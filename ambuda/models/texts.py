@@ -27,6 +27,7 @@ from sqlalchemy import select, exists
 from sqlalchemy.orm import backref, relationship, Mapped, mapped_column, object_session
 
 from ambuda.models.base import Base, foreign_key, pk
+from ambuda.utils.s3 import S3Path
 
 
 class TitleConfig(BaseModel):
@@ -354,6 +355,36 @@ class TextExport(Base):
             return next(x for x in EXPORTS if x.matches(self.slug))
         except StopIteration:
             return None
+
+    def asset_url(self, base_url: str) -> str | None:
+        """Return the CloudFront URL for this export, or None if not an asset."""
+        return S3Path.from_path(self.s3_path).to_asset_url(base_url)
+
+
+class BulkExport(Base):
+    """A catalog of bulk exports (e.g. ZIP archives of all texts)."""
+
+    __tablename__ = "bulk_exports"
+
+    id = pk()
+    #: A unique identifier for this export (e.g. "ambuda-xml.zip").
+    slug: Mapped[str] = mapped_column(String, unique=True)
+    #: The type of bulk export.
+    export_type: Mapped[str] = mapped_column(String, nullable=False)
+    #: The path to this resource on S3.
+    s3_path: Mapped[str] = mapped_column(String, nullable=False)
+    #: Size in bytes.
+    size: Mapped[int] = mapped_column(Integer, nullable=False)
+    #: SHA256 checksum of the file contents.
+    sha256_checksum: Mapped[str | None] = mapped_column(String, nullable=True)
+    #: When this export was last updated.
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC), nullable=False
+    )
+
+    def asset_url(self, base_url: str) -> str | None:
+        """Return the CloudFront URL for this export, or None if not an asset."""
+        return S3Path.from_path(self.s3_path).to_asset_url(base_url)
 
 
 class TextReport(Base):
