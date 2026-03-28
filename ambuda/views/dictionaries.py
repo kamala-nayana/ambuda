@@ -14,7 +14,7 @@ If a source list is invalid, we raise a 404 error.
 import functools
 
 from flask import Blueprint, abort, redirect, render_template, request, session, url_for
-from vidyut.lipi import detect, transliterate, Scheme
+from ambuda.utils.vidyut_shim import detect, transliterate, Scheme
 
 import ambuda.queries as q
 from ambuda.utils import xml

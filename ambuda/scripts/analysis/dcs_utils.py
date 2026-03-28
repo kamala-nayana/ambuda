@@ -8,7 +8,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 
 import conllu
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 
 @dataclass

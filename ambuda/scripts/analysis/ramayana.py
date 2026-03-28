@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import Iterator
 from pathlib import Path
 
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 

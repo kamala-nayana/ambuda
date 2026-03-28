@@ -18,7 +18,7 @@ from lxml import etree
 from pydantic import BaseModel
 from sqlalchemy import func as sqla_func
 from sqlalchemy.orm import object_session
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 import ambuda.database as db
 from ambuda.utils.datetime import utc_datetime_timestamp

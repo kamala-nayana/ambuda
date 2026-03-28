@@ -4,7 +4,7 @@ from pathlib import Path
 from flask import current_app
 from pydantic import BaseModel, TypeAdapter
 from vidyut.kosha import Kosha, PadaEntry, PratipadikaEntry
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 from vidyut.prakriya import Lakara
 
 

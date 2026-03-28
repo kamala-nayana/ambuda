@@ -3,7 +3,7 @@ import json
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 import ambuda.database as db
 from ambuda import queries as q

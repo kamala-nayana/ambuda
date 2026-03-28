@@ -21,7 +21,8 @@ from flask import (
 from flask_login import current_user, login_required
 from pydantic import BaseModel
 from sqlalchemy import orm, select
-from vidyut.lipi import Scheme
+
+from ambuda.utils.vidyut_shim import Scheme
 
 from ambuda import database as db
 from ambuda import queries as q
@@ -198,7 +199,7 @@ def _check_one_block(text: str, block_type: str, chandas, checker) -> dict:
 
 def _check_one_verse(text: str, chandas, checker) -> dict:
     """Check meter for a single verse. Returns a result dict."""
-    from vidyut.lipi import Scheme, transliterate
+    from ambuda.utils.vidyut_shim import Scheme, transliterate
 
     from ambuda.utils.text_validation import MeterCheck
 
@@ -669,7 +670,7 @@ def entry_htmx(sources, query):
 
 @bp.route("/bharati/query/<query>")
 def bharati_query(query):
-    from vidyut.lipi import Scheme, detect, transliterate
+    from ambuda.utils.vidyut_shim import Scheme, detect, transliterate
 
     from ambuda.views.bharati import _get_kosha_entries
 
@@ -684,7 +685,7 @@ def bharati_query(query):
 @bp.route("/bharati/grammar")
 def bharati_grammar():
     """Return kosha entries filtered by form, lemma, and parse."""
-    from vidyut.lipi import Scheme, detect, transliterate
+    from ambuda.utils.vidyut_shim import Scheme, detect, transliterate
 
     from ambuda.views.bharati import (
         _filter_kosha_entries,
@@ -713,7 +714,7 @@ def bharati_grammar():
 @bp.route("/bharati/dhatu/<dhatu_spec>")
 def bharati_dhatu_fragment(dhatu_spec):
     """Return an HTML fragment with dhatu conjugation tables."""
-    from vidyut.lipi import Scheme, detect, transliterate
+    from ambuda.utils.vidyut_shim import Scheme, detect, transliterate
 
     from ambuda.views.bharati import (
         _create_lakara_table,
@@ -762,7 +763,7 @@ def bharati_dhatu_fragment(dhatu_spec):
 @bp.route("/bharati/krt/<krt_value>")
 def bharati_krt_fragment(krt_value):
     """Return an HTML fragment with krt suffix information."""
-    from vidyut.lipi import Scheme, transliterate
+    from ambuda.utils.vidyut_shim import Scheme, transliterate
 
     from ambuda.views.bharati import KRT_ANUBANDHAS
     from vidyut.prakriya import Krt

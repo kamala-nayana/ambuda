@@ -12,7 +12,7 @@ import defusedxml.ElementTree as DET
 from dharmamitra_sanskrit_grammar import DharmamitraSanskritProcessor as DSP
 from sqlalchemy import select
 from vidyut.kosha import Kosha
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 from ambuda import consts
 from ambuda import database as db

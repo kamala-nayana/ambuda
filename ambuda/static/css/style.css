@@ -21,7 +21,7 @@
     @apply bg-red-200 text-red-700;
   }
 
-  .deva-serif {
+  .deva-serif, .serif {
     /* font-family: "Noto Serif Devanagari", serif; */
     font-family: "Tiro Devanagari Sanskrit", serif;
   }
@@ -120,6 +120,9 @@
 
   .prose {
     @apply tw-prose tw-prose-slate;
+  }
+  .prose h2 {
+    @apply serif;
   }
   .prose dt {
     @apply uppercase text-xs font-bold text-slate-400 mb-1;

@@ -1,13 +1,19 @@
 {% extends 'base-text.html' %}
+{% import "macros/components.html" as m %}
 
 
-{% block title %}{{ _('Terms of Use') }} {{ _('| Ambuda') }}{% endblock %}
+{% block title %}{{ m.title(_('Terms of Use')) }}{% endblock %}
 
 
-{% block content %}
+{% block header %}
+{{ m.basic_header(_('Terms of Use'), current_user) }}
+{% endblock %}
+
+
+{% block main %}
+<article class="p-4 md:p-0 max-w-xl mx-auto md:my-24 md:mb-36">
 {% set contact_url = url_for('about.contact') %}
 <div class="prose">
-<h1>{{ _('Terms of Use') }}</h1>
 
 <p>Welcome to Ambuda! To fulfill our mission of making the Sanskrit tradition
 radically accessible, Ambuda provides users with the ability to read
@@ -29,4 +35,5 @@ discussing texts through proofing, under the following conditions:</p>
 <p>If you have any questions about these terms, please <a href="{{ contact_url }}">contact us</a>.</p>
 
 </div>
+</article>
 {% endblock %}

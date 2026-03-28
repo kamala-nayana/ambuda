@@ -34,7 +34,7 @@ from lxml import etree
 from lxml.html import fragment_fromstring, tostring as html_tostring
 
 import defusedxml.ElementTree as DET
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 Attributes = NewType("Attributes", dict[str, str])
 

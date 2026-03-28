@@ -1,5 +1,5 @@
 from flask import Blueprint, abort, render_template
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 import ambuda.queries as q
 

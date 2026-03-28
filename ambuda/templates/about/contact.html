@@ -5,10 +5,15 @@
 {% block title %}{{ m.title(_('Contact')) }}{% endblock %}
 
 
-{% block content %}
+{% block header %}
+{{ m.basic_header(_('Contact'), current_user) }}
+{% endblock %}
+
+
+{% block main %}
+<article class="p-4 md:p-0 max-w-xl mx-auto md:my-24 md:mb-36">
 {% set support = url_for('site.support') %}
 <div class="prose">
-<h1>{{ _('Contact') }}</h1>
 
 <p>{% trans %}
 For comments, questions, and feedback on our work, please use the form below to
@@ -27,4 +32,5 @@ here</a> to learn more about how you can do so.
 </form>
 
 </div>
+</article>
 {% endblock %}

@@ -1,13 +1,19 @@
 {% extends 'base-text.html' %}
+{% import "macros/components.html" as m %}
 
 
-{% block title %}{{ _('Privacy Policy') }} {{ _('| Ambuda') }}{% endblock %}
+{% block title %}{{ m.title(_('Privacy Policy')) }}{% endblock %}
 
 
-{% block content %}
+{% block header %}
+{{ m.basic_header(_('Privacy Policy'), current_user) }}
+{% endblock %}
+
+
+{% block main %}
+<article class="p-4 md:p-0 max-w-xl mx-auto md:my-24 md:mb-36">
 {% set contact_url = url_for('about.contact') %}
 <div class="prose">
-<h1>{{ _('Privacy Policy') }}</h1>
 
 <p>Ambuda is committed to protecting your privacy. This document explains what
 data Ambuda collects about you and how we share and retain it.</p>
@@ -68,4 +74,5 @@ obligations.</p>
 href="{{ contact_url }}">contact us</a>.</p>
 
 </div>
+</article>
 {% endblock %}

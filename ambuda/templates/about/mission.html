@@ -6,36 +6,40 @@
 
 
 {% block meta_description -%}
-Ambuda's mission is to make the Sanskrit tradition radically accessible. Learn
+Ambuda's mission is to create a complete library of Sanskrit heritage. Here we write
 more about what this means specifically.
 {%- endblock %}
 
 
-{% block content %}
+{% block header %}
+{{ m.basic_header(_('Mission'), current_user) }}
+{% endblock %}
+
+
+{% block main %}
+<article class="p-4 md:p-0 max-w-xl mx-auto md:my-24 md:mb-36">
 <div class="prose">
-<h1>{{ _('Mission') }}</h1>
 
 <p>{% trans %}
-Ambuda's mission is to make the Sanskrit tradition radically accessible.
-Specifically, we have three goals:
+Our mission is to create a complete library of Sanskrit heritage. This goal has three parts:
 {% endtrans %}</p>
 
 <ol>
 <li>{% trans %}
-Create <strong>a complete archive</strong> of traditional Sanskrit literature
+Create reliable digital editions of all known Sanskrit texts.
 {% endtrans %}</li>
 
 <li>{% trans %}
-Publish this archive in <strong>an open format</strong>.
+Publish these editions freely for the public benefit.
 {% endtrans %}</li>
 
 <li>{% trans %}
-Integrate this archive with <strong>intelligent tools</strong> for students and scholars.
+Integrate this library with intelligent tools for students and scholars.
 {% endtrans %}</li>
 </ol>
 
 
-<h2>{{ _('A complete archive') }}</h2>
+<h2>{{ _('Digitizing the Sanskrit corpus') }}</h2>
 
 <p>{% trans %}
 The Sanskrit corpus is vast. Conservative estimates suggest that there at least
@@ -66,7 +70,7 @@ and build an archive that is as complete as possible.
 {% endtrans %}</p>
 
 
-<h2>{{ _('An open format') }}</h2>
+<h2>{{ _('The public benefit') }}</h2>
 
 <p>{% trans %}
 A complete archive is of no use if it is difficult to access. We must publish
@@ -114,4 +118,5 @@ and other dynamic features will give readers powerful tools for exploring all of
 Sanskrit literature.
 {% endtrans %}</p>
 </div>
+</article>
 {% endblock %}

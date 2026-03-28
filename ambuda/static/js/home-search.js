@@ -1,4 +1,4 @@
-import { toHK } from './sanskrit-search';
+import { toHK, normalizeHK } from './sanskrit-search';
 
 /**
  * Alpine component for the homepage search bar with fuzzy dropdown.
@@ -14,8 +14,8 @@ export default (items) => ({
   init() {
     this.entries = items.map((item) => {
       const text = item.title.toLowerCase();
-      const hk = toHK(item.title).toLowerCase();
-      return { ...item, text, hk };
+      const norm = normalizeHK(toHK(item.title)).toLowerCase();
+      return { ...item, text, norm };
     });
   },
 
@@ -26,9 +26,9 @@ export default (items) => ({
       return;
     }
     const q = this.query.toLowerCase();
-    const qHK = toHK(this.query).toLowerCase();
+    const qNorm = normalizeHK(toHK(this.query)).toLowerCase();
     this.results = this.entries
-      .filter((e) => e.text.includes(q) || e.hk.includes(q) || e.text.includes(qHK) || e.hk.includes(qHK))
+      .filter((e) => e.text.includes(q) || e.norm.includes(qNorm))
       .slice(0, 10);
     this.selectedIndex = -1;
     this.open = this.results.length > 0;

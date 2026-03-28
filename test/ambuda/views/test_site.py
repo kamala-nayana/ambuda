@@ -23,7 +23,7 @@ def test_sponsor(client):
 
 def test_support(client):
     resp = client.get("/support")
-    assert "<h1>Support</h1>" in resp.text
+    assert ">Support</h1>" in resp.text
 
 
 def test_404(client):

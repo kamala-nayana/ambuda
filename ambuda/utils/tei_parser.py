@@ -19,7 +19,7 @@ from xml.etree import ElementTree as ET
 
 import defusedxml.ElementTree as DET
 
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 #: Most texts have multiple sections and use section slugs like "1", "2", etc.
 #: If a text has just one section, we create a single "default" section with

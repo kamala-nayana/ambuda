@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from xml.etree import ElementTree as ET
 
 import defusedxml.ElementTree as DET
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 from ambuda.seed.utils.sandhi_utils import AC
 from ambuda.utils.word_parses import Token

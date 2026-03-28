@@ -10,7 +10,7 @@ from flask import (
     session,
     url_for,
 )
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 import ambuda.database as db
 import ambuda.queries as q

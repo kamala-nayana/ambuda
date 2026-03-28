@@ -5,7 +5,7 @@ from datetime import datetime, UTC
 from dateutil.relativedelta import relativedelta
 from flask import session
 from jinja2 import pass_context
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 from markdown_it import MarkdownIt
 
 #: A markdown parser for user-generated text.

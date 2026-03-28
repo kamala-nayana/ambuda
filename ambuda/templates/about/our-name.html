@@ -8,9 +8,14 @@
 {% block meta_description %}The origin and meaning of the name "Ambuda"{% endblock %}
 
 
-{% block content %}
+{% block header %}
+{{ m.basic_header(_('Our Name'), current_user) }}
+{% endblock %}
+
+
+{% block main %}
+<article class="p-4 md:p-0 max-w-xl mx-auto md:my-24 md:mb-36">
 <div class="prose">
-<h1>{{ _('Our Name') }}</h1>
 
 <p>{% trans %}
 In July 2013, we prototyped a website where people could collaboratively
@@ -50,4 +55,5 @@ epics, Krishna is said to be as dark as the clouds.
 {% endtrans %}</p>
 
 </div>
+</article>
 {% endblock %}

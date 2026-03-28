@@ -11,7 +11,7 @@ from typing import BinaryIO, NamedTuple, Union
 from lxml import etree
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import object_session
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 import ambuda.database as db
 from ambuda.utils.xml_validation import XML_ID, validate_tei_xml

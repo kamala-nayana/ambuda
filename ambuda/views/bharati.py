@@ -4,7 +4,7 @@ from pathlib import Path
 
 from flask import Blueprint, render_template, current_app, request, redirect, url_for
 from vidyut.kosha import Kosha, PadaEntry, PratipadikaEntry, DhatuEntry
-from vidyut.lipi import detect, transliterate, Scheme
+from ambuda.utils.vidyut_shim import detect, transliterate, Scheme
 from vidyut.prakriya import (
     Vyakarana,
     Prakriya,

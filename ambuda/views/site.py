@@ -5,7 +5,7 @@ from flask import Blueprint, redirect, render_template, request, session, url_fo
 from ambuda import queries as q
 from ambuda.consts import LOCALES
 from ambuda.utils import text_utils
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 bp = Blueprint("site", __name__)
 

@@ -13,7 +13,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from pydantic import BaseModel
-from vidyut.lipi import Scheme, transliterate
+from ambuda.utils.vidyut_shim import Scheme, transliterate
 
 import ambuda.queries as q
 from ambuda import database as db

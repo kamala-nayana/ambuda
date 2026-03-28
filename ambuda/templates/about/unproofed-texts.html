@@ -1,13 +1,19 @@
 {% extends 'base-text.html' %}
+{% import "macros/components.html" as m %}
 {% import "macros/icons.html" as i %}
 
 
-{% block title %}{{ _('Unproofed texts') }} {{ _('| Ambuda') }}{% endblock %}
+{% block title %}{{ m.title(_('Unproofed texts')) }}{% endblock %}
 
 
-{% block content %}
+{% block header %}
+{{ m.basic_header(_('Unproofed texts'), current_user) }}
+{% endblock %}
+
+
+{% block main %}
+<article class="p-4 md:p-0 max-w-xl mx-auto md:my-24 md:mb-36">
 <div class="prose">
-<h1>{{ _('Unproofed texts') }}</h1>
 
 <p>Ambuda's goal is to create a complete archive of Sanskrit literature. Since such an archive is
 massive and our team is small, we must balance the quality of a text with the speed at which we
@@ -47,5 +53,6 @@ human expert, they can narrow the gap and even uncover errors that a human exper
 <p>On this basis, we plan to massively expand our library with unproofed texts and gradually refine
 them over time.</p>
 
-
+</div>
+</article>
 {% endblock %}

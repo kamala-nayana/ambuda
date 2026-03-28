@@ -19,9 +19,14 @@
 {% set dcs = "http://sanskrit-linguistics.org/dcs/" %}
 
 
-{% block content %}
+{% block header %}
+{{ m.basic_header(_('Code and Data'), current_user) }}
+{% endblock %}
+
+
+{% block main %}
+<article class="p-4 md:p-0 max-w-xl mx-auto md:my-24 md:mb-36">
 <div class="prose">
-<h1>{{ _('Code and Data') }}</h1>
 
 <p>{% trans %}
 All of our code is available <a href="{{ code_url }}">on GitHub</a>. We use
@@ -54,4 +59,5 @@ Parse data comes from the <a href="{{ dcs }}">Digital Corpus of Sanskrit</a>
 {% endtrans %}</p>
 
 </div>
+</article>
 {% endblock %}

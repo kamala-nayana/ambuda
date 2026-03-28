@@ -21,7 +21,7 @@ import re
 from collections.abc import Iterator
 
 import click
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 from ambuda.seed.utils.cdsl_utils import create_from_scratch
 from ambuda.seed.utils.data_utils import create_db, fetch_text

@@ -6,7 +6,7 @@ Mirrors the titleToSlug logic in ambuda/static/js/publish-config.js.
 import re
 import unicodedata
 
-from vidyut.lipi import transliterate, Scheme
+from ambuda.utils.vidyut_shim import transliterate, Scheme
 
 _DIACRITICS = {
     "ś": "sh",

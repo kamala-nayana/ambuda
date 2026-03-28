@@ -10,6 +10,14 @@ export function toHK(str) {
 }
 
 /**
+ * Normalize an HK string for fuzzy matching by collapsing similar sounds.
+ * Applied before lowercasing: z→s, RR→R, lR→l, G→n, J→n, M→n.
+ */
+export function normalizeHK(str) {
+  return str.replace(/z/g, 's').replace(/sh/g, 's').replace(/([kgcjTDtdpb])h/g, '$1').replace(/RR/g, 'R').replace(/lR/g, 'l').replace(/G/g, 'n').replace(/J/g, 'n').replace(/M/g, 'n').replace(/m/g, 'n');
+}
+
+/**
  * A text matcher for Sanskrit text.
  */
 export function createSearchMatcher(items, getText) {

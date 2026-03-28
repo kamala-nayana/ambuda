@@ -8,7 +8,7 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from vidyut.lipi import detect, transliterate, Scheme
+from ambuda.utils.vidyut_shim import detect, transliterate, Scheme
 
 from ambuda.database import Project
 

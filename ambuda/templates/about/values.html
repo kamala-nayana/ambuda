@@ -5,9 +5,14 @@
 {% block title %}{{ m.title(_('Values')) }}{% endblock %}
 
 
-{% block content %}
+{% block header %}
+{{ m.basic_header(_('Values'), current_user) }}
+{% endblock %}
+
+
+{% block main %}
+<article class="p-4 md:p-0 max-w-xl mx-auto md:my-24 md:mb-36">
 <div class="prose">
-<h1>{{ _('Values') }}</h1>
 
 <p>{% trans %}
 Ambuda's mission is to make the Sanskrit tradition radically accessible. This
@@ -73,5 +78,6 @@ Along the way, we might make mistakes and false steps. Our first efforts might
 be crude and disappointing. But bit by bit, we continue on.
 {% endtrans %}</p>
 
-
+</div>
+</article>
 {% endblock %}
